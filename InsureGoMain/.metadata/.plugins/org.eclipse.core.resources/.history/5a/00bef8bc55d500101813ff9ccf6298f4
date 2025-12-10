@@ -1,0 +1,47 @@
+package com.example.demo.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.bean.User;
+import com.example.demo.repository.UserRepository;
+
+@Service
+public class AuthService {
+	@Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // --- Registration Logic ---
+    public User registerUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+             throw new RuntimeException("Email is already in use!");
+        }
+        
+        // HASH the password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+		return userRepository.save(user);
+    }
+
+    // --- Login Logic (Authentication) ---
+    public Optional<User> validateUser(String email, String rawPassword) {
+        
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            
+            // Compare raw password against the HASHED password
+            if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+                return userOptional; // Success!
+            }
+        }
+        return Optional.empty(); 
+    }
+}

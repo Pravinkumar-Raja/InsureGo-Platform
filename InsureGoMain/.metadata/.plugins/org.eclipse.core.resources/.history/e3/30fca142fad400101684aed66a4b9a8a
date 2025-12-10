@@ -1,0 +1,55 @@
+package com.example.demo.controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+import com.example.demo.bean.User;
+import com.example.demo.service.AuthService;
+@RestController
+@RequestMapping("/register")
+public class AuthController {
+@Autowired
+private AuthService rserv;
+@PostMapping("/addRegister")
+public String addRegister(@RequestBody User rb) {
+	return rserv.addRegister(rb);
+	}
+//@GetMapping("/login")
+// public ModelAndView meth1()
+//{
+//	return new ModelAndView("Login");
+//}
+//@PostMapping("/validate")
+//public ModelAndView meth2(@RequestBody RegisterBean rb)
+//{
+//	if(rb.getUserid()!=null&&rb.getPassword()!=null)
+//	{
+//		return new ModelAndView("redirect:./addlogin");
+//	}
+//	else
+//	{
+//		ModelAndView modelAndView = new ModelAndView("Login"); 
+//        modelAndView.addObject("error", "Invalid credentials, please try again.");
+//        return modelAndView;
+//	
+//}
+//}
+//}
+@PostMapping("/addlogin")
+public String addCredential(@RequestBody User rb) {
+	String id=rb.getUserid();
+	String pass=rb.getPassword();
+	int i=rserv.addCredential(id,pass);
+	if(i==1)
+	{
+		return "Login Successfull";
+	}
+	else{
+		System.out.println("User Not Found");
+		return "redirect:/addRegister";
+	}	
+}
+}

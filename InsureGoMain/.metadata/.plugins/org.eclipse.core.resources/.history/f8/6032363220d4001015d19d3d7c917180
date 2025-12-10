@@ -1,0 +1,32 @@
+package com.example.demo.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.bean.DoctorBean;
+import com.example.demo.dao.AdminDao;
+
+@Service
+public class AdminService {
+@Autowired
+private AdminDao adao;
+
+public int addDoctor(DoctorBean db)
+{
+	int i=0;
+	if(db!=null)
+	{
+		adao.save(db);
+		i=1;
+	}
+	
+	return i;
+}
+public String updateDoctor(DoctorBean db)
+{
+	long id=db.getDid();
+	DoctorBean ddb=adao.findById(id).orElseThrow();
+	adao.save(ddb);
+	return "Updated Successfully";
+}
+}

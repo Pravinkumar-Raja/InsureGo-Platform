@@ -1,0 +1,47 @@
+package com.example.demo.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.bean.User;
+import com.example.demo.repository.UserRepository;
+
+@Service
+public class AuthService {
+@Autowired
+private UserRepository rerepo;
+ 
+public String addRegister(User rb) {
+	if(rb!=null) {
+		rerepo.save(rb);
+		return "Registered Succesfully..";
+	}else {
+		return "Not Registered..";
+	}
+	
+}
+
+public int addCredential(String userid, String pass) {
+	
+	
+	Optional<User> rb=rerepo.findByUserid(userid);
+	if (rb.isPresent()) {
+	User rrb=rb.get();
+	if(rrb.getPassword().equals(pass))
+	{
+		return 1;
+		
+	}
+	else
+	{
+		return 0;
+	}
+	}
+	else
+	{
+		return 0;
+	}
+}
+}
