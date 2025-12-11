@@ -7,8 +7,10 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +22,7 @@ import com.example.demo.payload.request.PhoneRequest;
 import com.example.demo.payload.request.OtpVerificationRequest;
 import com.example.demo.payload.request.RegisterRequest;
 import com.example.demo.payload.response.JwtResponse;
+import com.example.demo.payload.response.NameResponse;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.service.AuthService;
@@ -142,5 +145,37 @@ public class AuthController {
         
         // This is returned if the user is not found OR if the passwordEncoder.matches fails.
         return ResponseEntity.status(401).body("Error: Invalid email or password.");
+    }
+    //============================================================
+    //3. Display Name in the Patient Dashboard
+    //============================================================
+    @GetMapping("/user/name")
+    public ResponseEntity<?> getUserName(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Missing or invalid Authorization header.");
+        }
+        
+        try {
+            // 1. Extract the JWT token (remove "Bearer ")
+            String jwt = authHeader.substring(7);
+            
+            // 2. Extract the user's email (identifier) from the JWT
+            String email = jwtUtils.getUserNameFromJwtToken(jwt); 
+            
+            // 3. Find the user in the database
+            Optional<User> userOptional = userRepository.findByEmail(email);
+
+            if (userOptional.isPresent()) {
+                String userName = userOptional.get().getName();
+                
+                // 4. Return the name
+                return ResponseEntity.ok(new NameResponse(userName));
+            } else {
+                return ResponseEntity.status(404).body("User profile not found.");
+            }
+        } catch (Exception e) {
+            // This catches issues like invalid/expired tokens or JwtUtils failure
+            return ResponseEntity.status(401).body("Invalid or expired token.");
+        }
     }
 }

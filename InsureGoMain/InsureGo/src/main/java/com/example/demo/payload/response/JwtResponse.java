@@ -7,7 +7,6 @@ private String email;
 private String role;
 
 	// ... fields ...
-// ✅ CORRECTED CONSTRUCTOR: Must accept token, email, and role
 public JwtResponse(String token, String email, String role) {
     this.token = token;
     this.email = email;
